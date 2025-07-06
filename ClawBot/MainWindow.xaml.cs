@@ -79,34 +79,37 @@ namespace ClawBot
                     Path.Combine(modelsDir, "Arm2.obj"),
                     new Vector3D(1, 0, 0),
                     new Point3D(0, 0, 60),
-                    Color.FromRgb(64, 64, 64)
+                    Color.FromRgb(64, 64, 64),
+                    -90
                 );
                 _armPart3 = _controller.AddChildPart(
                     _armPart2,
                     Path.Combine(modelsDir, "Arm3.obj"),
                     new Vector3D(1, 0, 0),
                     new Point3D(0, 0, 90),
-                    Color.FromRgb(64, 64, 64)
+                    Color.FromRgb(64, 64, 64),
+                    90
                 );
                 _armPart4 = _controller.AddChildPart(
                     _armPart3,
                     Path.Combine(modelsDir, "Arm4.obj"),
                     new Vector3D(1, 0, 0),
                     new Point3D(0, 0, 125),
-                    Color.FromRgb(64, 64, 64)
+                    Color.FromRgb(64, 64, 64),
+                    90
                 );
                 _clawPart1 = _controller.AddChildPart(
                     _armPart4,
                     Path.Combine(modelsDir, "Claw1.obj"),
-                    new Vector3D(0, 0, 1),
-                    new Point3D(15, 0, 50),
+                    new Vector3D(0, 1, 0),
+                    new Point3D(15, -7, 45),
                     Colors.Green
                 );
                 _clawPart2 = _controller.AddChildPart(
                     _armPart4,
                     Path.Combine(modelsDir, "Claw2.obj"),
-                    new Vector3D(0, 0, 1),
-                    new Point3D(-15, 0, 50),
+                    new Vector3D(0, 1, 0),
+                    new Point3D(-15, -7, 45),
                     Colors.Green
                 );
             }
@@ -121,22 +124,31 @@ namespace ClawBot
             viewport.ZoomExtents(0.7);
         }
 
+        // Вращеине базы
         private void rotationSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _controller.UpdatePart(_platformPart, e.NewValue);
         }
+
+        // Вращение плеча
         private void shoulderSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _controller.UpdatePart(_armPart2, e.NewValue);
         }
+
+        // Вращение локтя
         private void elbowSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_armPart3, e.NewValue);
+            _controller.UpdatePart(_armPart3, -e.NewValue);
         }
+
+        // Вращение запястья
         private void wristSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_armPart4, e.NewValue);
+            _controller.UpdatePart(_armPart4, -e.NewValue);
         }
+
+        // Вращение захвата
         private void gripSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _controller.UpdatePart(_clawPart1, e.NewValue);

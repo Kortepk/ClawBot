@@ -16,12 +16,11 @@ namespace ClawBot.Controls
         // Свойства детали
         public Model3D Model { get; set; }
         public Vector3D RotationAxis { get; set; } = new Vector3D(0, 1, 0); // Ось по умолчанию (Y)
-        public Point3D RotationCenter { get; set; } = new Point3D(0, 0, 0); // Точка вращения
         public double CurrentAngle { get; private set; } // Текущий угол
+        public double initAngle { get; set; }
         public Point3D LocalConnectionPoint { get; set; } // Точка соединения предыдущий детали в локальных координатах
         public Point3D GlobalShiftPoint { get; set; } // Глобальная точка сдвига, меняется при изменения угла родителя
         public Matrix3D LocalTransform { get; set; }
-        public Matrix3D GlobalTransform { get; set; }
         public RobotPart Parent { get; set; }
         public List<RobotPart> Children { get; } = new List<RobotPart>();
         public Transform3DGroup Transform { get; } = new Transform3DGroup();
@@ -74,76 +73,42 @@ namespace ClawBot.Controls
         public void UpdateTransform(double angle)
         {
             // Обновляем текущий угол
-            CurrentAngle = angle;
+            CurrentAngle = angle + initAngle;
 
-            // Применяем трансформации
+            var tempMatrix = new Transform3DGroup();
+
+            tempMatrix.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(RotationAxis, CurrentAngle)));
+            tempMatrix.Children.Add(new TranslateTransform3D(LocalConnectionPoint.X, LocalConnectionPoint.Y, LocalConnectionPoint.Z));
+
             Transform.Children.Clear();
-            Transform.Children.Add(new MatrixTransform3D(LocalTransform));
-
-            Transform.Children.Insert(0, new MatrixTransform3D(GlobalTransform));
-
-            var rotation = new RotateTransform3D(
-            new AxisAngleRotation3D(RotationAxis, CurrentAngle));
-            LocalTransform = rotation.Value;
-
-
-            Transform.Children.Add(new TranslateTransform3D(
-            new Vector3D(
-                GlobalShiftPoint.X,
-                GlobalShiftPoint.Y,
-                GlobalShiftPoint.Z)));
-
-            // Получаем новую мировую матрицу
-
+            Transform.Children.Add(tempMatrix); // Добавляем локальную
+            Transform.Children.Add(Parent.Transform); // Добавляем глобальную
+            
             // Обновляем всех детей
             foreach (var child in Children)
             {
                 // Применяем компенсацию к детям
-                child.CompensateParentTransform(GlobalShiftPoint, LocalTransform);
+                child.CompensateParentTransform(Transform);
             }
 
         }
 
-        public void CompensateParentTransform(Point3D shiftPoint, Matrix3D compensationTransform)
+        public void CompensateParentTransform(Transform3DGroup parentTransform)
         {
-            GlobalTransform = compensationTransform;
+            var tempMatrix = new Transform3DGroup();
+
+            tempMatrix.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(RotationAxis, CurrentAngle)));
+            tempMatrix.Children.Add(new TranslateTransform3D(LocalConnectionPoint.X, LocalConnectionPoint.Y, LocalConnectionPoint.Z));
+
             Transform.Children.Clear();
-
-            Point3D positionAfter = compensationTransform.Transform(LocalConnectionPoint);
-
-            GlobalShiftPoint = new Point3D(
-                shiftPoint.X + positionAfter.X,
-                shiftPoint.Y + positionAfter.Y,
-                shiftPoint.Z + positionAfter.Z
-            );
-
-            Transform.Children.Add(new MatrixTransform3D(LocalTransform));
-
-            Transform.Children.Insert(0, new MatrixTransform3D(GlobalTransform));
-
-            // Компенсируем родительскую трансформацию
-            Transform.Children.Add(new TranslateTransform3D(
-            new Vector3D(
-                GlobalShiftPoint.X,
-                GlobalShiftPoint.Y,
-                GlobalShiftPoint.Z)));
+            Transform.Children.Add(tempMatrix); // Добавляем локальную
+            Transform.Children.Add(Parent.Transform); // Добавляем глобальную
 
             // Делаем компенсацию всем детям
             foreach (var child in Children)
             {
-                child.CompensateParentTransform(GlobalShiftPoint, Transform.Value);
+                child.CompensateParentTransform(Transform);
             }
-        }
-
-        public Matrix3D GetWorldTransform()
-        {
-            return Transform.Value;
-            var matrix = Transform.Value;
-            if (Parent != null)
-            {
-                matrix = Matrix3D.Multiply(matrix, Parent.GetWorldTransform());
-            }
-            return matrix;
         }
     }
 }

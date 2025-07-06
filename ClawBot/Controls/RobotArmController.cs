@@ -20,11 +20,12 @@ namespace ClawBot.Controls
         }
 
         // axis - ось вокруг которой происходит вращение, connectionPoint - точка соединения с предыдущей деталью, по умолчанию своё вращение происходит вокруг н
-        public RobotPart AddRootPart(string modelPath, Vector3D axis, Point3D connectionPoint, Color color)
+        public RobotPart AddRootPart(string modelPath, Vector3D axis, Point3D connectionPoint, Color color, double initAngle = 0)
         {
             var part = new RobotPart(modelPath, connectionPoint, color)
             {
-                RotationAxis = axis
+                RotationAxis = axis,
+                initAngle = initAngle
             };
 
             Parts.Add(part);
@@ -32,11 +33,12 @@ namespace ClawBot.Controls
             return part;
         }
 
-        public RobotPart AddChildPart(RobotPart parent, string modelPath, Vector3D axis, Point3D connectionPoint, Color color)
+        public RobotPart AddChildPart(RobotPart parent, string modelPath, Vector3D axis, Point3D connectionPoint, Color color, double initAngle = 0)
         {
             var child = new RobotPart(modelPath, connectionPoint, color)
             {
-                RotationAxis = axis
+                RotationAxis = axis,
+                initAngle = initAngle
             };
             // Тут добавить инициализацию начального угла поворота детали
             parent.AddChild(child);
