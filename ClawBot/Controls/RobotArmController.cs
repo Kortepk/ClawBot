@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace ClawBot.Controls
@@ -19,9 +20,9 @@ namespace ClawBot.Controls
         }
 
         // axis - ось вокруг которой происходит вращение, connectionPoint - точка соединения с предыдущей деталью, по умолчанию своё вращение происходит вокруг н
-        public RobotPart AddRootPart(string modelPath, Vector3D axis, Point3D connectionPoint)
+        public RobotPart AddRootPart(string modelPath, Vector3D axis, Point3D connectionPoint, Color color)
         {
-            var part = new RobotPart(modelPath, connectionPoint)
+            var part = new RobotPart(modelPath, connectionPoint, color)
             {
                 RotationAxis = axis
             };
@@ -31,9 +32,9 @@ namespace ClawBot.Controls
             return part;
         }
 
-        public RobotPart AddChildPart(RobotPart parent, string modelPath, Vector3D axis, Point3D connectionPoint)
+        public RobotPart AddChildPart(RobotPart parent, string modelPath, Vector3D axis, Point3D connectionPoint, Color color)
         {
-            var child = new RobotPart(modelPath, connectionPoint)
+            var child = new RobotPart(modelPath, connectionPoint, color)
             {
                 RotationAxis = axis
             };

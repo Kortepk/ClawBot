@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 
@@ -24,13 +26,43 @@ namespace ClawBot.Controls
         public List<RobotPart> Children { get; } = new List<RobotPart>();
         public Transform3DGroup Transform { get; } = new Transform3DGroup();
 
-        public RobotPart(string modelPath, Point3D connectionPoint)
+        public RobotPart(string modelPath, Point3D connectionPoint, Color color)
         {
             var importer = new ModelImporter();
             Model = importer.Load(modelPath);
+
+            // Создаем новый материал
+            var newMaterial = new DiffuseMaterial(new SolidColorBrush(color));
+
+            // Перебираем все части модели
+            if (Model is Model3DGroup group)
+            {
+                RecolorModel(group, newMaterial);
+            }
+            else if (Model is GeometryModel3D geometryModel)
+            {
+                geometryModel.Material = newMaterial;
+                geometryModel.BackMaterial = newMaterial;
+            }
+
             Model.Transform = Transform;
             LocalConnectionPoint = connectionPoint;
             GlobalShiftPoint = LocalConnectionPoint;
+        }
+        private void RecolorModel(Model3DGroup modelGroup, Material newMaterial)
+        {
+            foreach (var childModel in modelGroup.Children)
+            {
+                if (childModel is Model3DGroup nestedGroup)
+                {
+                    RecolorModel(nestedGroup, newMaterial);
+                }
+                else if (childModel is GeometryModel3D geometryModel)
+                {
+                    geometryModel.Material = newMaterial;
+                    geometryModel.BackMaterial = newMaterial;
+                }
+            }
         }
 
         public void AddChild(RobotPart child)
@@ -51,6 +83,7 @@ namespace ClawBot.Controls
             var rotation = new RotateTransform3D(
             new AxisAngleRotation3D(RotationAxis, CurrentAngle));
             LocalTransform = rotation.Value;
+
             Transform.Children.Add(new MatrixTransform3D(LocalTransform));
 
             Transform.Children.Add(new TranslateTransform3D(
@@ -60,14 +93,14 @@ namespace ClawBot.Controls
                 GlobalShiftPoint.Z)));
 
             // Получаем новую мировую матрицу
-            Matrix3D newWorldTransform = GetWorldTransform();
 
             // Обновляем всех детей
             foreach (var child in Children)
             {
                 // Применяем компенсацию к детям
-                child.CompensateParentTransform(GlobalShiftPoint, newWorldTransform);
+                child.CompensateParentTransform(GlobalShiftPoint, LocalTransform);
             }
+
         }
 
         public void CompensateParentTransform(Point3D shiftPoint, Matrix3D compensationTransform)
@@ -103,6 +136,7 @@ namespace ClawBot.Controls
 
         public Matrix3D GetWorldTransform()
         {
+            return Transform.Value;
             var matrix = Transform.Value;
             if (Parent != null)
             {
