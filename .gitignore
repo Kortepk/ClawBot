@@ -76,6 +76,7 @@ StyleCopReport.xml
 *.ilk
 *.meta
 *.obj
+!ClawBot/model/**/*.obj
 *.iobj
 *.pch
 *.pdb
