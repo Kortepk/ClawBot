@@ -66,6 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ArduinoPort.cs" />
     <Compile Include="Controls\RobotArmController.cs" />
     <Compile Include="Controls\RobotPart.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -91,6 +92,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="img\refresh-icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="model\Arduino.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

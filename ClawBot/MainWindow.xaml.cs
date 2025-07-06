@@ -1,9 +1,12 @@
 ﻿using ClawBot.Controls;
 using HelixToolkit.Wpf;
 using System;
+using System.Data;
 using System.IO;
+using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
@@ -26,12 +29,15 @@ namespace ClawBot
             _clawPart1,
             _clawPart2;
 
+        private ArduinoPort _arduinoPort = new ArduinoPort();
+
         public MainWindow()
         {
             InitializeComponent();
 
             _controller = new RobotArmController(viewport);
 
+            RefreshPorts_Click(null, null);
             // Инициализация модели
             LoadModels();
         }
@@ -127,32 +133,82 @@ namespace ClawBot
         // Вращеине базы
         private void rotationSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_platformPart, e.NewValue);
+            int val = Convert.ToInt32(e.NewValue);
+            _controller.UpdatePart(_platformPart, val);
+            _arduinoPort.SendServoCommand(1, val);
         }
 
         // Вращение плеча
         private void shoulderSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_armPart2, e.NewValue);
+            int val = Convert.ToInt32(e.NewValue);
+            _controller.UpdatePart(_armPart2, val);
+            _arduinoPort.SendServoCommand(4, val);
         }
 
         // Вращение локтя
         private void elbowSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_armPart3, -e.NewValue);
+            int val = Convert.ToInt32(e.NewValue);
+            _controller.UpdatePart(_armPart3, -val);
+            _arduinoPort.SendServoCommand(5, val);
+
         }
 
         // Вращение запястья
         private void wristSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_armPart4, -e.NewValue);
+            int val = Convert.ToInt32(e.NewValue);
+            _controller.UpdatePart(_armPart4, -val);
+            _arduinoPort.SendServoCommand(3, val);
+
         }
 
         // Вращение захвата
         private void gripSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            _controller.UpdatePart(_clawPart1, e.NewValue);
-            _controller.UpdatePart(_clawPart2, -e.NewValue);
+            int val = Convert.ToInt32(e.NewValue);
+            _controller.UpdatePart(_clawPart1, val);
+            _controller.UpdatePart(_clawPart2, -val);
+            _arduinoPort.SendServoCommand(2, val);
+        }
+
+        // Кнопка нажатия на обновление портов
+        private void RefreshPorts_Click(object sender, RoutedEventArgs e)
+        {
+            string[] port_list = SerialPort.GetPortNames();
+            PortsComboBox.Items.Clear();
+            foreach (var i in port_list)
+            {
+                PortsComboBox.Items.Add(i);
+                Console.WriteLine(i);
+            }
+
+            // Обновляет список портов, если порт добавлен или удалён  
+            if (PortsComboBox.Items.Count <= 1)
+                PortsComboBox.SelectedIndex = 0;
+
+        }
+
+        private void ConnectCom_Click(object sender, RoutedEventArgs e)
+        {
+            string butStr = ConnectCom.Content.ToString();
+            if (butStr == "Подключиться")
+            {
+                bool ret = _arduinoPort.Connect(PortsComboBox.SelectedItem.ToString());
+                if(ret)
+                    ConnectCom.Content = "Отключится";
+            }
+            else
+            {
+                _arduinoPort.Disconnect();
+                ConnectCom.Content = "Подключиться";
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _arduinoPort.Dispose();
         }
     }
 }
