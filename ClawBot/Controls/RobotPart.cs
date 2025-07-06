@@ -78,13 +78,14 @@ namespace ClawBot.Controls
 
             // Применяем трансформации
             Transform.Children.Clear();
+            Transform.Children.Add(new MatrixTransform3D(LocalTransform));
+
             Transform.Children.Insert(0, new MatrixTransform3D(GlobalTransform));
 
             var rotation = new RotateTransform3D(
             new AxisAngleRotation3D(RotationAxis, CurrentAngle));
             LocalTransform = rotation.Value;
 
-            Transform.Children.Add(new MatrixTransform3D(LocalTransform));
 
             Transform.Children.Add(new TranslateTransform3D(
             new Vector3D(
@@ -116,9 +117,9 @@ namespace ClawBot.Controls
                 shiftPoint.Z + positionAfter.Z
             );
 
-            Transform.Children.Insert(0, new MatrixTransform3D(GlobalTransform));
-
             Transform.Children.Add(new MatrixTransform3D(LocalTransform));
+
+            Transform.Children.Insert(0, new MatrixTransform3D(GlobalTransform));
 
             // Компенсируем родительскую трансформацию
             Transform.Children.Add(new TranslateTransform3D(
@@ -127,10 +128,10 @@ namespace ClawBot.Controls
                 GlobalShiftPoint.Y,
                 GlobalShiftPoint.Z)));
 
-            // Пропагируем компенсацию всем детям
+            // Делаем компенсацию всем детям
             foreach (var child in Children)
             {
-                child.CompensateParentTransform(GlobalShiftPoint, compensationTransform);
+                child.CompensateParentTransform(GlobalShiftPoint, Transform.Value);
             }
         }
 
