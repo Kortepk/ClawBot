@@ -1,8 +1,11 @@
-﻿using HelixToolkit.Wpf;
+﻿using ClawBot.Controls;
+using HelixToolkit.Wpf;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 
 namespace ClawBot
 {
@@ -11,59 +14,59 @@ namespace ClawBot
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly RobotArmController _controller;
+        private RobotPart _basePart;
+        private RobotPart _childPart;
+
         public MainWindow()
         {
             InitializeComponent();
-            LoadModel();
-            rotationSlider.ValueChanged += RotationSlider_ValueChanged;
+
+            _controller = new RobotArmController(viewport);
+
+            // Инициализация модели
+            LoadModels();
         }
-        private void LoadModel()
+
+        private async void LoadModels()
         {
             try
             {
-                // 1. Создаём импортёр моделей
-                var importer = new ModelImporter();
+                string modelsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model");
 
-                // 2. Указываем путь к модели (3 варианта)
+                // Базовая деталь
+                _basePart = _controller.AddRootPart(
+                    Path.Combine(modelsDir, "1.obj"),
+                    new Vector3D(0, 1, 0),
+                    new Point3D(0, 0, 0));
 
-                // Вариант A: Из папки с исполняемым файлом
-                string modelPath = System.IO.Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "model/1.obj");
-
-                // Вариант B: Абсолютный путь (для теста)
-                // string modelPath = @"C:\Project\ClawBot\models\YourModel.obj";
-
-                // Вариант C: Из ресурсов (если добавили в проект)
-                // string modelPath = "pack://application:,,,/YourModel.obj";
-
-                // 3. Загружаем модель
-                var model = importer.Load(modelPath);
-
-                // 4. Добавляем в сцену
-                robotModel.Content = model;
-
-                // 5. Автоматически подгоняем камеру
-                viewport.ZoomExtents();
+                _childPart = _controller.AddChildPart(
+                    _basePart,
+                    Path.Combine(modelsDir, "2.obj"),
+                    new Vector3D(1, 0, 0),
+                    new Point3D(0, 0, 25));
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки модели:\n{ex.Message}",
-                               "ClawBot",
-                               MessageBoxButton.OK,
-                               MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}");
             }
+
+            // Ждём обновления layout
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+
+            viewport.ZoomExtents(0.7);
         }
 
-        private void RotationSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void BaseSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (robotModel.Content is Model3DGroup modelGroup)
-            {
-                var transform = new RotateTransform3D();
-                transform.Rotation = new AxisAngleRotation3D(new Vector3D(0, 1, 0), e.NewValue);
-                modelGroup.Transform = transform;
-            }
+            int partIndex = int.Parse(((FrameworkElement)sender).Tag.ToString());
+            _controller.UpdatePart(_basePart, e.NewValue);
+            viewport.ZoomExtents();
         }
-
+        private void ArmSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            _controller.UpdatePart(_childPart, e.NewValue);
+            viewport.ZoomExtents();
+        }
     }
 }

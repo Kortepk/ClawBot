@@ -9,18 +9,24 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- 3D Viewport -->
         <h:HelixViewport3D x:Name="viewport" Grid.Row="0">
             <h:DefaultLights/>
-            <ModelVisual3D x:Name="robotModel"/>
         </h:HelixViewport3D>
 
-        <!-- Slider Control -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
-            <TextBlock Text="Rotation Angle:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <Slider x:Name="rotationSlider" Width="300" Minimum="0" Maximum="360" Value="0"/>
-            <TextBox x:Name="angleText" Width="50" Margin="10,0,0,0" 
-                     Text="{Binding ElementName=rotationSlider, Path=Value, StringFormat={}{0:F0}°}"/>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="10">
+            <!-- Ползунок для базовой детали -->
+            <StackPanel Orientation="Horizontal" Margin="0,5">
+                <TextBlock Text="Base Rotation 1:" Width="100"/>
+                <Slider x:Name="baseSlider" Tag="0" Width="300" Minimum="-180" Maximum="180" ValueChanged="BaseSlider_ValueChanged"/>
+                <TextBox Text="{Binding ElementName=baseSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50"/>
+            </StackPanel>
+
+            <!-- Ползунок для второй детали -->
+            <StackPanel Orientation="Horizontal" Margin="0,5">
+                <TextBlock Text="Arm Rotation 2:" Width="100"/>
+                <Slider x:Name="armSlider" Tag="1" Width="300" Minimum="-90" Maximum="90" ValueChanged="ArmSlider_ValueChanged"/>
+                <TextBox Text="{Binding ElementName=armSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
