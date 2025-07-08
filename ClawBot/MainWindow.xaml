@@ -3,6 +3,136 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         Title="Robot Arm Controller" Height="600" Width="800" Closing="Window_Closing">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="BlueSliderThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Ellipse x:Name="Ellipse" 
+                             Width="14" 
+                             Height="14" 
+                             Fill="#4DA6FF"
+                             Stroke="#0066FF"
+                             StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для заполненной части трека -->
+        <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="#3F007400"  
+                    Height="4" 
+                    CornerRadius="1"
+                    BorderBrush="#007400"
+                    BorderThickness="0.5"
+                    />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для пустой части трека -->
+        <Style x:Key="SliderEmptyTrack" TargetType="RepeatButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="#FFFFFF" 
+                    Height="4" 
+                    CornerRadius="1"
+                    BorderBrush="#007400"
+                    BorderThickness="0.5"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="BlueRoundedButton" TargetType="Button">
+            <Setter Property="Background" Value="#4DA6FF"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3399FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#0077E6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#B3D9FF"/>
+                                <Setter Property="Foreground" Value="#808080"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для Slider (белый трек + синий ползунок) -->
+        <Style TargetType="Slider">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#4DA6FF"/>
+            <!-- Цвет заполненной части трека -->
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <Track x:Name="PART_Track">
+                                <!-- Верхний трек (заполненная часть) -->
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource SliderRepeatButton}"/>
+                                </Track.DecreaseRepeatButton>
+
+                                <!-- Ползунок -->
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource BlueSliderThumb}"/>
+                                </Track.Thumb>
+
+                                <!-- Нижний трек (пустая часть) -->
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource SliderEmptyTrack}"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+
+    </Window.Resources>
+
     <Grid>
         <h:HelixViewport3D x:Name="viewport" Grid.Column="0" ZoomExtentsWhenLoaded="True">
             <h:HelixViewport3D.Camera>
@@ -21,39 +151,41 @@
             Padding="5"
             >
             <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="Управлене манипулятором" FontFamily="Cascadia Code SemiBold" FontSize="16" TextAlignment="Center" Margin="0,0,0,8"/>
+
                 <!-- Поворотный модуль (основание) -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                    <TextBlock Text="Поворотный модуль:" Width="120" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="rotationSlider" Tag="0" Width="100" Minimum="0" Maximum="180" ValueChanged="rotationSlider_ValueChanged" SmallChange="1"/>
-                    <TextBox Text="{Binding ElementName=rotationSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50" IsReadOnly="True"/>
+                    <TextBlock Text="Поворотный модуль:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
+                    <Slider x:Name="rotationSlider" Tag="0" Width="95" Minimum="0" Maximum="180" ValueChanged="rotationSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding ElementName=rotationSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Плечевой сустав -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                    <TextBlock Text="Плечевой сустав:" Width="120" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="shoulderSlider" Tag="1" Width="100" Minimum="0" Maximum="180" ValueChanged="shoulderSlider_ValueChanged" SmallChange="1"/>
-                    <TextBox Text="{Binding ElementName=shoulderSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50" IsReadOnly="True"/>
+                    <TextBlock Text="Плечевой сустав:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
+                    <Slider x:Name="shoulderSlider" Tag="1" Width="95" Minimum="0" Maximum="180" ValueChanged="shoulderSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding ElementName=shoulderSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Локтевой сустав -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                    <TextBlock Text="Локтевой сустав:" Width="120" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="elbowSlider" Tag="2" Width="100" Minimum="0" Maximum="180" ValueChanged="elbowSlider_ValueChanged" SmallChange="1"/>
-                    <TextBox Text="{Binding ElementName=elbowSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50" IsReadOnly="True"/>
+                    <TextBlock Text="Локтевой сустав:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
+                    <Slider x:Name="elbowSlider" Tag="2" Width="95" Minimum="0" Maximum="180" ValueChanged="elbowSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding ElementName=elbowSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Кистевой сустав -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                    <TextBlock Text="Кистевой сустав:" Width="120" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="wristSlider" Tag="3" Width="100" Minimum="0" Maximum="180" ValueChanged="wristSlider_ValueChanged" SmallChange="1"/>
-                    <TextBox Text="{Binding ElementName=wristSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50" IsReadOnly="True"/>
+                    <TextBlock Text="Кистевой сустав:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
+                    <Slider x:Name="wristSlider" Tag="3" Width="95" Minimum="0" Maximum="180" ValueChanged="wristSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding ElementName=wristSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Захват (клешня) -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                    <TextBlock Text="Захват:" Width="120" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="gripSlider" Tag="4" Width="100" Minimum="0" Maximum="90" ValueChanged="gripSlider_ValueChanged" SmallChange="1"/>
-                    <TextBox Text="{Binding ElementName=gripSlider, Path=Value, StringFormat={}{0:F0}°}" Width="50" IsReadOnly="True"/>
+                    <TextBlock Text="Захват:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
+                    <Slider x:Name="gripSlider" Tag="4" Width="95" Minimum="0" Maximum="90" ValueChanged="gripSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding ElementName=gripSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
             </StackPanel>
@@ -70,30 +202,19 @@
         Padding="5"
         >
             <StackPanel Orientation="Vertical">
-                <TextBlock Text="Настройки COM порта"/>
+                <TextBlock Text="Настройка COM порта" FontFamily="Cascadia Code SemiBold" FontSize="14"/>
                 <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" Margin="0,10,0,10">
-                    <ComboBox x:Name="PortsComboBox" Width="90" Margin="0,0,0,0" Height="20"/>
-                    <Button Content="" Click="RefreshPorts_Click" Width="20" Height="20" Margin="10,0,0,0">
+                    <ComboBox x:Name="PortsComboBox"  Width="90" Margin="0,0,0,0" Height="20"/>
+                    <Button Click="RefreshPorts_Click" Style="{StaticResource BlueRoundedButton}" Width="20" Height="20" Margin="10,0,0,0">
                         <Button.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="10"/>
                             </Style>
                         </Button.Resources>
-                        <Button.Background>
-                            <ImageBrush ImageSource="img/refresh-icon.png">
-                                <ImageBrush.RelativeTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform CenterY="0.5" CenterX="0.5" ScaleX="0.95" ScaleY="0.95"/>
-                                        <SkewTransform CenterX="0.5" CenterY="0.5"/>
-                                        <RotateTransform CenterX="0.5" CenterY="0.5"/>
-                                        <TranslateTransform/>
-                                    </TransformGroup>
-                                </ImageBrush.RelativeTransform>
-                            </ImageBrush>
-                        </Button.Background>
+                        <Image Source="img/refresh-icon-white.png" Width="16" Height="16"/>
                     </Button>
                 </StackPanel>
-                <Button x:Name="ConnectCom" Content="Подключиться" Click="ConnectCom_Click" Margin="0,0,0,0" Width="120" Height="21" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Button x:Name="ConnectCom" Style="{StaticResource BlueRoundedButton}" Content="Подключиться" Click="ConnectCom_Click"  Width="120" Height="21" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
     </Grid>

@@ -92,6 +92,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="img\refresh-icon-white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="img\refresh-icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
