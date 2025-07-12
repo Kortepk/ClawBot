@@ -7,6 +7,7 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
@@ -171,6 +172,16 @@ namespace ClawBot
             _controller.UpdatePart(_clawPart1, val);
             _controller.UpdatePart(_clawPart2, -val);
             _arduinoPort.SendServoCommand(2, val);
+        }
+
+        private void Slider_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var slider = sender as Slider;
+            if (slider != null)
+            {
+                slider.Value += e.Delta > 0 ? 1 : -1;
+                e.Handled = true;
+            }
         }
 
         // Кнопка нажатия на обновление портов

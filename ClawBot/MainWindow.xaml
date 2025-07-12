@@ -156,35 +156,35 @@
                 <!-- Поворотный модуль (основание) -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Поворотный модуль:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="rotationSlider" Tag="0" Width="95" Minimum="0" Maximum="180" ValueChanged="rotationSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <Slider x:Name="rotationSlider" Tag="0" Width="95" Minimum="0" Maximum="180" ValueChanged="rotationSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0" PreviewMouseWheel="Slider_PreviewMouseWheel"/>
                     <TextBox Text="{Binding ElementName=rotationSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Плечевой сустав -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Плечевой сустав:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="shoulderSlider" Tag="1" Width="95" Minimum="0" Maximum="180" ValueChanged="shoulderSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <Slider x:Name="shoulderSlider" Tag="1" Width="95" Minimum="0" Maximum="180" ValueChanged="shoulderSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0" PreviewMouseWheel="Slider_PreviewMouseWheel"/>
                     <TextBox Text="{Binding ElementName=shoulderSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Локтевой сустав -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Локтевой сустав:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="elbowSlider" Tag="2" Width="95" Minimum="0" Maximum="180" ValueChanged="elbowSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <Slider x:Name="elbowSlider" Tag="2" Width="95" Minimum="0" Maximum="160" ValueChanged="elbowSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0" PreviewMouseWheel="Slider_PreviewMouseWheel"/>
                     <TextBox Text="{Binding ElementName=elbowSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Кистевой сустав -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Кистевой сустав:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="wristSlider" Tag="3" Width="95" Minimum="0" Maximum="180" ValueChanged="wristSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <Slider x:Name="wristSlider" Tag="3" Width="95" Minimum="0" Maximum="130" ValueChanged="wristSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0" PreviewMouseWheel="Slider_PreviewMouseWheel"/>
                     <TextBox Text="{Binding ElementName=wristSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
                 <!-- Захват (клешня) -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Захват:" Width="131" TextAlignment="Right" Margin="0,0,10,0"/>
-                    <Slider x:Name="gripSlider" Tag="4" Width="95" Minimum="0" Maximum="90" ValueChanged="gripSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0"/>
+                    <Slider x:Name="gripSlider" Tag="4" Width="95" Minimum="0" Maximum="90" ValueChanged="gripSlider_ValueChanged" SmallChange="1" Margin="0,0,5,0" PreviewMouseWheel="Slider_PreviewMouseWheel"/>
                     <TextBox Text="{Binding ElementName=gripSlider, Path=Value, StringFormat={}{0:F0}°}" Width="35" IsReadOnly="True"/>
                 </StackPanel>
 
